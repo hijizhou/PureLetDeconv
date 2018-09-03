@@ -12,10 +12,11 @@ References:
 - [3] J. Li, F. Luisier and T. Blu, PURE-LET deconvolution of 3D fluorescence microscopy images, 
         2017 14th Proc. IEEE Int. Symp. Biomed. Imaging (ISBI'17), Melbourne, Australia, 2017, pp. 723-727.
    
-Installation
+### Installation
 -----------
-# Dependencies
+#### Dependencies
 
+```
 <dependencies>
 		<dependency>
 			<groupId>net.imagej</groupId>
@@ -57,23 +58,24 @@ Installation
 			<version>3.6.1</version>
 		</dependency>
 	</dependencies>
+```
 
-# Installing the plugin
+#### Installing the plugin
 
 Drag and drop the unzipped plugin .jar file (from the Explorer, Finder or any file browser) into the plugins directory. See https://imagej.net/Installing_3rd_party_plugins for details of the installation process in different systems.
 
-Usage:
+### Usage:
 -----------
 
-# Demo
+#### Demo
 This module provides the simulation evaluation. Given the original image and degradation parameters (PSF size, noise levels), the deconvolution performance can be evaluated by the peak-signal-to-noise ratio (PSNR). 
 
-# Run
+#### Run
 - Given the blurred noisy image, the parameters of the noise model are automatically estimated or manually adjusted.  
 - Click on the "Start" button to launch the deconvolution task.
 - Click on the "Stop" button to abort the current deconvolution task.
 
-To-do:
+### To-do:
 -----------
 
 - The automatical estimation of the PSF size based on the algorithm described in Li et al. "Gaussian blur estimation for photon-limited images", ICIP'17.
