@@ -1,6 +1,6 @@
  In a variety of applications, ranging from astronomical imaging to biological microscopy, the predominant source of noise follows a Poisson distribution due to the quantum nature of the photon-counting process at the detectors. The observation model for a linear degradation caused by blurring and Poisson noise (and possibly additive Gaussian noise) is given by
 
-![Screenshot](Resources/model.png)
+$\my = \alpha\ \mathcal{P}\left(\frac{\bH\mx}{\alpha}\right) + \mathcal{N}(\mathbf{0},\sigma^2\bOne)$
 
 where {y} denotes the distorted observation of the unknown true image {x}. {H} implements a convolution of the point spread function. {P} represents the effect of Poisson noise.
 
