@@ -28,9 +28,9 @@ package com.org.jtransforms.dst;
 
 import java.util.Arrays;
 import com.org.jtransforms.utils.CommonUtils;
-import pl.edu.icm.jlargearrays.ConcurrencyUtils;
+import com.pl.edu.icm.jlargearrays.ConcurrencyUtils;
 import com.org.jtransforms.utils.IOUtils;
-import pl.edu.icm.jlargearrays.FloatLargeArray;
+import com.pl.edu.icm.jlargearrays.FloatLargeArray;
 
 /**
  * Benchmark of single precision DST's

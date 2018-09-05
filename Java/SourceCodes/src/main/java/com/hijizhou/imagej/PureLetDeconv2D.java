@@ -42,9 +42,12 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     JSlider sldDemoPSFsize = new JSlider(0, 0, 500, 300);
     JSlider sldDemoAlpha = new JSlider(0, 0, 1000, 10);
     JSlider sldDemoStd = new JSlider(0, 0, 1000, 0);
-    JSlider sldRunPSFsize = new JSlider(0, 0, 500, 300);
+    JSlider sldRunPSFsize = new JSlider(0, 0, 1000, 100);
     JSlider sldRunAlpha = new JSlider(0, 0, 1000, 100);
     JSlider sldRunStd = new JSlider(0, 0, 1000, 100);
+    JSlider sldRunNA = new JSlider(0, 50, 200, 140);
+    JSlider sldRunLambda = new JSlider(0, 250, 750, 605);
+    JSlider sldRunPixelSize = new JSlider(0, 100, 2000, 100);
     private ColorModel cmY;
     private JTabbedPane tab = new JTabbedPane();
     private GridBagLayout layout = new GridBagLayout();
@@ -73,17 +76,21 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     private ImageWare estInput;
     private JButton bnDemoRun = new JButton("Start Deconvolution");
     private JButton bnDemoSim = new JButton("Simulate");
-    private JButton bnRunEstNoise = new JButton("Noise Estimation");
+    private JButton bnRunEstNoise = new JButton("Estimate");
     private JButton bnRunRun = new JButton("Start Deconvolution");
-    private JComboBox cmbPSF = new JComboBox(new String[]{"Confocal"});
+    private JComboBox cmbPSF = new JComboBox(new String[]{"Gaussian"});
     private JComboBox cmbPSFRun = new JComboBox(new String[]{"Confocal"});
     private ButtonGroup bgConvolution;
     private ButtonGroup bgResults;
-    private JLabel lblDemoAlpha = new JLabel("<html>Level (alpha)</html>");
+    private JLabel lblDemoAlpha = new JLabel("<html>Level <br/>(alpha)</html>");
     private JLabel lblDemoStd = new JLabel("<html>Gaussian noise<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std.</html>");
     private JLabel lblDemoPSFsize = new JLabel("PSF Variance");
+    private JLabel lblRunNA = new JLabel("<html>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NA</html>");
+    private JLabel lblRunLambda = new JLabel("<html>Wavelength <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(nm)</html>");
+    private JLabel lblRunPixelSize = new JLabel("<html>Pixelsize <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(nm)</html>");
     private JLabel lblPSF = new JLabel("Choose PSF");
     private JTextField txtDemoAlpha = new JTextField("1.00", 3);
+
     GridPanel jplDemoAlpha = addSliderValue(sldDemoAlpha, txtDemoAlpha, 50);
     private JTextField txtDemoStd = new JTextField("0.00", 3);
     GridPanel jplDemoStd = addSliderValue(sldDemoStd, txtDemoStd, 50);
@@ -100,15 +107,23 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     //    private JRadioButton checkDemoShowPSF = new JRadioButton("Show PSF?", false);
     private JRadioButton checkDemoPostFilter = new JRadioButton("Post-Filtering?", true);
     //Part-Run
-    private JLabel lblRunAlpha = new JLabel("<html>Level (alpha)</html>");
+    private JLabel lblRunAlpha = new JLabel("<html>Level <br/>(alpha)</html>");
     private JLabel lblRunStd = new JLabel("<html>Gaussian noise<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std.</html>");
-    private JLabel lblRunPSFsize = new JLabel("PSF Variance");
+    private JLabel lblRunPSFsize = new JLabel("PSF Size");
     private JLabel lblRunPSF = new JLabel("Choose PSF");
     private JTextField txtRunAlpha = new JTextField("1.00", 3);
     GridPanel jplRunAlpha = addSliderValue(sldRunAlpha, txtRunAlpha, 50);
+    private JTextField txtRunNA = new JTextField("1.4", 3);
+    private JTextField txtRunLambda = new JTextField("605", 3);
+    private JTextField txtRunPixelSize = new JTextField("100", 3);
+
+    GridPanel jplRunNA = addSliderValue(sldRunNA, txtRunNA, 10);
+    GridPanel jplRunLambda = addSliderValue(sldRunLambda, txtRunLambda, 50);
+    GridPanel jplRunPixelSize = addSliderValue(sldRunPixelSize, txtRunPixelSize, 100);
+
     private JTextField txtRunStd = new JTextField("1.00", 3);
     GridPanel jplRunStd = addSliderValue(sldRunStd, txtRunStd, 50);
-    private JTextField txtRunPSFsize = new JTextField("1.00", 3);
+    private JTextField txtRunPSFsize = new JTextField("1", 3);
     GridPanel jplRunPSFsize = addSliderValue(sldRunPSFsize, txtRunPSFsize, 50);
     private JLabel lblRunRunningTime = new JLabel("<html>Running Time (sec.)</html>");
     private JTextField txtRunTime = new JTextField("", 6);
@@ -116,10 +131,10 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     private JRadioButton checkRunPostFilter = new JRadioButton("Post-Filtering?", true);
 
     public PureLetDeconv2D() {
-        super(new Frame(), "2D PURE-LET Deconvolution");
+        super(new Frame(), "PURE-LET Image Deconvolution");
         this.walk
                 .fillAbout(
-                        "PURE-LET Deconvolution",
+                        "PURE-LET Image Deconvolution",
                         "Version 21/08/2018",
                         "PURE-LET Image Deconvolution",
                         "Department of Electronic Engineering<br/>The Chinese University of Hong Kong",
@@ -140,6 +155,10 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
 
         this.bgConvolution = new ButtonGroup();
         GridPanel pnConvolution = new GridPanel("Convolution & Noise");
+
+        this.txtRunNA.addActionListener(this);
+        this.txtRunLambda.addActionListener(this);
+        this.txtRunPixelSize.addActionListener(this);
 
         this.txtRunPSFsize.addActionListener(this);
         this.txtRunAlpha.addActionListener(this);
@@ -215,20 +234,54 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         pnControlsRun.place(0, 0, new JLabel("Input image"));
         pnControlsRun.place(0, 1, this.txtInput);
 
+        //change the label of sldRunNA
+        java.util.Hashtable<Integer,JLabel> labelTableNA = new java.util.Hashtable<Integer,JLabel>();
+        labelTableNA.put(new Integer(200), new JLabel("2.0"));
+        labelTableNA.put(new Integer(150), new JLabel("1.5"));
+        labelTableNA.put(new Integer(100), new JLabel("1.0"));
+        labelTableNA.put(new Integer(50), new JLabel("0.5"));
+        sldRunNA.setLabelTable( labelTableNA );
+        sldRunNA.setPaintLabels(true);
+        //change the label of sldRunLambda
+        java.util.Hashtable<Integer,JLabel> labelTableLambda = new java.util.Hashtable<Integer,JLabel>();
+        labelTableLambda.put(new Integer(750), new JLabel("750"));
+        labelTableLambda.put(new Integer(500), new JLabel("500"));
+        labelTableLambda.put(new Integer(250), new JLabel("250"));
+        sldRunLambda.setLabelTable( labelTableLambda );
+        sldRunLambda.setPaintLabels(true);
+        //change the label of sldRunPixelSize
+        java.util.Hashtable<Integer,JLabel> labelTablePixelSize = new java.util.Hashtable<Integer,JLabel>();
+        labelTablePixelSize.put(new Integer(2000), new JLabel("2000"));
+        labelTablePixelSize.put(new Integer(1000), new JLabel("1000"));
+        labelTablePixelSize.put(new Integer(100), new JLabel("100"));
+        sldRunPixelSize.setLabelTable( labelTablePixelSize );
+        sldRunPixelSize.setPaintLabels(true);
+
         GridPanel pnRunConvolution = new GridPanel("Convolution");
-        pnRunConvolution.place(0, 0, this.lblRunPSF);
-        pnRunConvolution.place(0, 1, this.cmbPSFRun);
-        pnRunConvolution.place(1, 0, this.lblRunPSFsize);
-        pnRunConvolution.place(1, 1, jplRunPSFsize);
+        pnRunConvolution.place(0, 0, this.lblRunNA);
+        pnRunConvolution.place(0, 1, this.jplRunNA);
+        pnRunConvolution.place(1, 0, this.lblRunLambda);
+        pnRunConvolution.place(1, 1, this.jplRunLambda);
+        pnRunConvolution.place(2,0, this.lblRunPixelSize);
+        pnRunConvolution.place(2,1,this.jplRunPixelSize);
+        pnRunConvolution.place(3, 0, this.lblRunPSF);
+        pnRunConvolution.place(3, 1, this.cmbPSFRun);
+        pnRunConvolution.place(4, 0, this.lblRunPSFsize);
+        pnRunConvolution.place(4, 1, jplRunPSFsize);
         this.cmbPSFRun.addActionListener(this);
 
         GridPanel pnRunNoise = new GridPanel("Noise");
         pnRunNoise.place(0, 0, this.lblRunAlpha);
         pnRunNoise.place(0, 1, jplRunAlpha);
+        pnRunNoise.place(0, 2, this.bnRunEstNoise);
 //        pnRunNoise.place(1, 0, this.lblRunStd);
 //        pnRunNoise.place(1, 1, jplRunStd);
 
 
+
+        jplRunNA.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jplRunLambda.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jplRunPixelSize.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jplRunPSFsize.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jplRunAlpha.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jplRunStd.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -242,10 +295,11 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         this.txtRunTime.setEnabled(false);
 
         GridPanel pnRunButtons = new GridPanel("");
-        pnRunButtons.place(0, 0, this.bnRunEstNoise);
+
         pnRunButtons.place(0, 1, bnRunRun);
         pnRunButtons.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
+        this.bnRunEstNoise.setPreferredSize(new Dimension(80, 40));
         this.bnRunEstNoise.addActionListener(this);
         this.bnRunRun.addActionListener(this);
 
@@ -338,6 +392,19 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         this.sldDemoStd.setEnabled(isready);
         this.sldDemoStd.setForeground(color);
 
+    }
+
+    public static double getPSFsize(double NA, double lambda, double pixelsize){
+        //Reference: ﻿Zhang, Bo, Josiane Zerubia, and Jean-Christophe Olivo-Marin. “Gaussian Approximations of Fluorescence Microscope Point-Spread Function Models.” Applied Optics 46.10 (2007): 1819. Web.
+
+        DecimalFormat df2 = new DecimalFormat("#,###,###,##0.00");
+
+        double rv = 0.25*lambda/(NA*pixelsize);
+        if(rv>100){
+            IJ.showMessage("PSF size is unsupported");
+            return 0;
+        }
+        return new Double(df2.format(rv));
     }
 
     public void changeStatusRun(boolean isready) {
@@ -602,6 +669,20 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         if (e.getSource() == this.txtRunPSFsize) {
             this.sldRunPSFsize.setValue((int) (Double.parseDouble(this.txtRunPSFsize.getText()) * 100.0));
         }
+
+        if (e.getSource() == this.txtRunNA) {
+            this.sldRunNA.setValue((int) (Double.parseDouble(this.txtRunNA.getText()) * 100.0));
+            updatePSFsizze();
+        }
+        if (e.getSource() == this.txtRunLambda) {
+            this.sldRunLambda.setValue((int) (Double.parseDouble(this.txtRunLambda.getText())));
+            updatePSFsizze();
+        }
+        if (e.getSource() == this.txtRunPixelSize) {
+            this.sldRunPixelSize.setValue((int) (Double.parseDouble(this.txtRunPixelSize.getText())));
+            updatePSFsizze();
+        }
+
         if (e.getSource() == this.txtRunAlpha) {
             this.sldRunAlpha.setValue((int) (Double.parseDouble(this.txtRunAlpha.getText()) * 100.0));
         }
@@ -613,7 +694,13 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
 
     public void noiseEstimation() {
         this.walk.setMessage("Starting noise estimation...");
+        long startTime = System.nanoTime();
         double[] fitRs = Operations.estimateNoiseParams(estInput, 100);
+
+        long endTime = System.nanoTime();
+
+        double estTime = (endTime - startTime) / 1000000000.0;
+        System.out.println("Noise estimation time: " + estTime);
 
         double alpha = fitRs[0] >= 0 ? fitRs[0] : 0.001;
         double variance = fitRs[2] * fitRs[2];
@@ -625,7 +712,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
 
         this.sldRunAlpha.setValue((int) alpha * 100);
         this.sldRunStd.setValue((int) variance * 100);
-        this.walk.setMessage("Finished, press Start");
+        this.walk.setMessage("Finished [" + new Double(df2.format(estTime)) + "s], press Start Deconvolution");
     }
 
     public void doSimulation() {
@@ -862,16 +949,23 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
 
         int strPSF = this.cmbPSF.getSelectedIndex();
 
+        double NA = Double.parseDouble(this.txtRunNA.getText());
+        double lambda = Double.parseDouble(this.txtRunLambda.getText());
+        double pixelsize = Double.parseDouble(this.txtRunPixelSize.getText());
+
+        double psfsigma =1/2.355*Double.parseDouble(this.txtRunPSFsize.getText());
+
+        System.out.println("Gaussian PSF size:" + psfsigma);
         switch (strPSF) {
             case 0: //Gaussian
-                PSF = PSFUtil.getGaussPSF(width, height, Math.sqrt(new Double(txtRunPSFsize.getText()).doubleValue()));
+                PSF = PSFUtil.getGaussPSF(width, height, psfsigma);
                 break;
             case 1: // Uniform:
                 break;
             case 2: // SeparableFilter:
                 break;
             default:
-                PSF = PSFUtil.getGaussPSF(width, height, Math.sqrt(new Double(txtDemoPSFsize.getText()).doubleValue()));
+                PSF = PSFUtil.getGaussPSF(width, height, psfsigma);
                 break;
         }
 
@@ -927,6 +1021,16 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
 
     }
 
+    public void updatePSFsizze(){
+                double na = Double.parseDouble(this.txtRunNA.getText());
+
+                double lambda = Double.parseDouble(txtRunLambda.getText());
+                double pixelsize = Double.parseDouble(txtRunPixelSize.getText());
+                double psfsize = getPSFsize(na, lambda, pixelsize);
+
+                txtRunPSFsize.setText(psfsize + "");
+                sldRunPSFsize.setValue((int)psfsize * 100);
+    }
     @Override
     public void stateChanged(ChangeEvent e) {
 
@@ -957,7 +1061,55 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
             this.txtDemoStd.setText(this.sldDemoStd.getValue() / 100.00 + "");
         }
 
+        if (e.getSource() == this.sldRunNA) {
+            double na = this.sldRunNA.getValue();
+            this.txtRunNA.setText(na / 100.00 + "");
 
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    double lambda = Double.parseDouble(txtRunLambda.getText());
+                    double pixelsize = Double.parseDouble(txtRunPixelSize.getText());
+                    double psfsize = getPSFsize(na/100, lambda, pixelsize);
+
+                    txtRunPSFsize.setText(psfsize + "");
+                    sldRunPSFsize.setValue((int)psfsize * 100);
+                }
+            });
+            t.start();
+
+        }
+        if (e.getSource() == this.sldRunLambda) {
+            int lamda = this.sldRunLambda.getValue();
+            this.txtRunLambda.setText(lamda + "");
+
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    double na = Double.parseDouble(txtRunNA.getText());
+                    double pixelsize = Double.parseDouble(txtRunPixelSize.getText());
+                    double psfsize = getPSFsize(na, lamda+0.0d, pixelsize);
+
+                    txtRunPSFsize.setText(psfsize + "");
+                    sldRunPSFsize.setValue((int)psfsize * 100);
+                }
+            });
+            t.start();
+        }
+        if (e.getSource() == this.sldRunPixelSize) {
+            int pixelsize = this.sldRunPixelSize.getValue();
+            this.txtRunPixelSize.setText(pixelsize + "");
+
+            Thread t = new Thread(new Runnable() {
+                public void run() {
+                    double lambda = Double.parseDouble(txtRunLambda.getText());
+                    double na = Double.parseDouble(txtRunNA.getText());
+                    double psfsize = getPSFsize(na, lambda+0.0d, pixelsize);
+
+                    txtRunPSFsize.setText(psfsize + "");
+                    sldRunPSFsize.setValue((int)psfsize * 100);
+                }
+            });
+            t.start();
+        }
         if (e.getSource() == this.sldRunPSFsize) {
             double psfsize = this.sldRunPSFsize.getValue();
             if (psfsize == 0) {
@@ -1053,7 +1205,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         }
 
         if (this.cmbPSFRun.getSelectedIndex() == 0) {
-            this.lblRunPSFsize.setText("PSF Variance");
+            this.lblRunPSFsize.setText("PSF Size");
             this.txtRunPSFsize.setEnabled(true);
             this.txtRunPSFsize.setForeground(Color.black);
             this.lblRunPSFsize.setForeground(Color.black);

@@ -32,9 +32,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.org.jtransforms.utils.CommonUtils;
-import pl.edu.icm.jlargearrays.ConcurrencyUtils;
-import pl.edu.icm.jlargearrays.FloatLargeArray;
-import pl.edu.icm.jlargearrays.LargeArray;
+import com.pl.edu.icm.jlargearrays.ConcurrencyUtils;
+import com.pl.edu.icm.jlargearrays.FloatLargeArray;
+import com.pl.edu.icm.jlargearrays.LargeArray;
 
 /**
  * Computes 1D Discrete Sine Transform (DST) of float precision data. The size

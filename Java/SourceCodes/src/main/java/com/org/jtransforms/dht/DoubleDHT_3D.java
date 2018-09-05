@@ -31,9 +31,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.org.jtransforms.utils.CommonUtils;
-import pl.edu.icm.jlargearrays.ConcurrencyUtils;
-import pl.edu.icm.jlargearrays.DoubleLargeArray;
-import pl.edu.icm.jlargearrays.LargeArray;
+import com.pl.edu.icm.jlargearrays.ConcurrencyUtils;
+import com.pl.edu.icm.jlargearrays.DoubleLargeArray;
+import com.pl.edu.icm.jlargearrays.LargeArray;
 
 /**
  * Computes 3D Discrete Hartley Transform (DHT) of real, double precision data.

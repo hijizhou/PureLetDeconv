@@ -160,6 +160,8 @@ public class MW_PURE_LET2D {
 
     public boolean doDeconvolution() {
 
+
+        System.out.println("---- begin deconvolution ----");
         double startTime = System.nanoTime(); // start timing
 
         DoubleMatrix2D S2 = this.getS2();
@@ -230,7 +232,7 @@ public class MW_PURE_LET2D {
         System.gc();
         ////////////////////////////
         double runningTime = (System.nanoTime() - startTime) / 1.0E9D;
-        System.out.println("Part 0 : " + runningTime + " s");
+        System.out.println("Part 0 running time: " + runningTime + " s");
 
         startTime = System.nanoTime(); // start timing
         DComplexMatrix1D[] matrixCFele = new DenseDComplexMatrix1D[2];
@@ -287,7 +289,7 @@ public class MW_PURE_LET2D {
 
 
         runningTime = (System.nanoTime() - startTime) / 1.0E9D;
-        System.out.println("Part 1 : " + runningTime + " s");
+        System.out.println("Part 1 running time: " + runningTime + " s");
 
         startTime = System.nanoTime(); // start timing
 
@@ -298,19 +300,14 @@ public class MW_PURE_LET2D {
 
         AbstractMatrix2D pemFtrans = matrixFTrans.copy();
 
-        startTime = System.nanoTime(); // start timing
-
         matrixFTrans.zMult(matrixCF, matrixM);
-
-        runningTime = (System.nanoTime() - startTime) / 1.0E9D;
-        System.out.println("Part 2--- : " + runningTime + " s");
 
         DoubleMatrix2D matrixA = matrixM.getRealPart();
         matrixA.assign(DoubleFunctions.div(Math.pow(width * height, 2)));
         DoubleMatrix1D matrixC = new DenseDoubleMatrix1D(width * height);
 
         runningTime = (System.nanoTime() - startTime) / 1.0E9D;
-        System.out.println("Part 2 : " + runningTime + " s");
+        System.out.println("Part 2 running time: " + runningTime + " s");
 
 
         startTime = System.nanoTime(); // start timing
@@ -404,7 +401,9 @@ public class MW_PURE_LET2D {
         recImg.assign(DoubleFunctions.abs);
 
         runningTime = (System.nanoTime() - startTime) / 1.0E9D;
-        System.out.println("Part 3 : " + runningTime + " s");
+        System.out.println("Part 3 running time: " + runningTime + " s");
+
+        System.out.println("Deconvolution finished");
 
         this.imOutput = recImg;
 

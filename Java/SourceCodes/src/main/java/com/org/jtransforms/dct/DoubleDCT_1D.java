@@ -32,11 +32,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.org.jtransforms.fft.DoubleFFT_1D;
 import com.org.jtransforms.utils.CommonUtils;
-import pl.edu.icm.jlargearrays.ConcurrencyUtils;
-import pl.edu.icm.jlargearrays.DoubleLargeArray;
-import pl.edu.icm.jlargearrays.LargeArray;
-import pl.edu.icm.jlargearrays.LongLargeArray;
-import pl.edu.icm.jlargearrays.LargeArrayUtils;
+import com.pl.edu.icm.jlargearrays.ConcurrencyUtils;
+import com.pl.edu.icm.jlargearrays.DoubleLargeArray;
+import com.pl.edu.icm.jlargearrays.LargeArray;
+import com.pl.edu.icm.jlargearrays.LongLargeArray;
+import com.pl.edu.icm.jlargearrays.LargeArrayUtils;
 import static org.apache.commons.math3.util.FastMath.*;
 
 /**

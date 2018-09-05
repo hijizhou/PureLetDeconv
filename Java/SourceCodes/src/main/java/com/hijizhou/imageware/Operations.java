@@ -1,5 +1,9 @@
 package com.hijizhou.imageware;
 
+import com.edu.emory.mathcs.utils.ConcurrencyUtils;
+
+import java.util.concurrent.Future;
+
 final public class Operations extends Object {
 
     private static final boolean offsets[][] = {
@@ -931,39 +935,69 @@ final public class Operations extends Object {
         double Tol = 1;
         int L = (int) Math.floor(Tol * (Nblk));
         double alpha = 0.0, beta = 0.0, delta = 0.0, sigma = 0.0, sig = 0.0, d;
-        int[] index = null;
+
         int[] offset = new int[2];
         double[] mean = new double[Nblk], sortedMean = new double[Nblk];
         double[] var = new double[Nblk];
         double[] rmean = new double[L], rvar = new double[L];
-        double[] alphaBeta = new double[2];
+//        double[] alphaBeta = new double[2];
         double[] noiseParams = new double[4];
         double[][] array = new double[Nx][Ny];
         java.util.Random rand = new java.util.Random(0);
-        for (int cs = 0; cs < CS; cs++) {
-            offset[0] = (int) (cs > 0 ? Math.floor(rand.nextDouble() * size[0]) : 0);
-            offset[1] = (int) (cs > 0 ? Math.floor(rand.nextDouble() * size[1]) : 0);
-            index = createIndex(Nblk);
-            in.getBlockXY(offset[0], offset[1], 0, array, ImageWare.PERIODIC);
-            computeBlkMean(array, mean, K1, K2, wtype);
-            computeBlkVar(Builder.create(array, ImageWare.DOUBLE), var, K1, K2);
-            System.arraycopy(mean, 0, sortedMean, 0, mean.length);
-            quickSort(sortedMean, index);
-            System.arraycopy(index, 0, index, 0, L);
-            putIndexedValues(mean, rmean, index, L);
-            putIndexedValues(var, rvar, index, L);
-            alphaBeta = wlsFit(rmean, rvar, wtype);
-            alpha = alpha + alphaBeta[0];
-            beta = beta + alphaBeta[1];
-            d = computeMode(restrictArray(rmean, 0, (int) Math.round(0.05 * L)));
-            //d     = computeMode(rmean);
-            delta = delta + d;
-            d = computeMode(restrictArray(rvar, 0, (int) Math.round(0.05 * L)));
-            //d     = computeMode(rvar);
-            sig = Math.sqrt(d);
-            //sig   = Math.sqrt(Math.max(d,Math.max(alphaBeta[1]+alphaBeta[0]*d,0)));
-            sigma = sigma + sig;
+
+        double[] Alpha = new double[CS]; //currently only compute alpha
+
+        int np = ConcurrencyUtils.getNumberOfThreads();
+        if ((np > 1)) {
+            Future<?>[] futures = new Future[np];
+            int k = CS / np;
+            for (int j = 0; j < np; j++) {
+                final int firstRow = j * k;
+                final int lastRow = (j == np - 1) ? CS : firstRow + k;
+
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        //basis functions for each pixel
+                        for (int cs = firstRow; cs < lastRow; cs++) {
+
+                            offset[0] = (int) (cs > 0 ? Math.floor(rand.nextDouble() * size[0]) : 0);
+                            offset[1] = (int) (cs > 0 ? Math.floor(rand.nextDouble() * size[1]) : 0);
+                            int[] index = createIndex(Nblk);
+                            in.getBlockXY(offset[0], offset[1], 0, array, ImageWare.PERIODIC);
+                            computeBlkMean(array, mean, K1, K2, wtype);
+                            computeBlkVar(Builder.create(array, ImageWare.DOUBLE), var, K1, K2);
+                            System.arraycopy(mean, 0, sortedMean, 0, mean.length);
+                            quickSort(sortedMean, index);
+                            System.arraycopy(index, 0, index, 0, L);
+                            putIndexedValues(mean, rmean, index, L);
+                            putIndexedValues(var, rvar, index, L);
+                            double[] alphaBeta = new double[2];
+                            alphaBeta = wlsFit(rmean, rvar, wtype);
+
+                            Alpha[cs] = alphaBeta[0];
+
+
+//            alpha = alpha + alphaBeta[0];
+//            beta = beta + alphaBeta[1];
+//            d = computeMode(restrictArray(rmean, 0, (int) Math.round(0.05 * L)));
+//            //d     = computeMode(rmean);
+//            delta = delta + d;
+//            d = computeMode(restrictArray(rvar, 0, (int) Math.round(0.05 * L)));
+//            //d     = computeMode(rvar);
+//            sig = Math.sqrt(d);
+//            //sig   = Math.sqrt(Math.max(d,Math.max(alphaBeta[1]+alphaBeta[0]*d,0)));
+//            sigma = sigma + sig;
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
         }
+
+        for (int cs = 1; cs < CS; cs++) {
+            alpha = alpha + Alpha[cs];
+        }
+
         noiseParams[0] = alpha / CS;
         noiseParams[1] = delta / CS;
         noiseParams[2] = sigma / CS;
