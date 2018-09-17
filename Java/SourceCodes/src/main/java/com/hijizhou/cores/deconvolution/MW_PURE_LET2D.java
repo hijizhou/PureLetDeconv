@@ -13,10 +13,12 @@ package com.hijizhou.cores.deconvolution;
 import com.cern.colt.matrix.AbstractMatrix2D;
 import com.cern.colt.matrix.tdcomplex.DComplexMatrix1D;
 import com.cern.colt.matrix.tdcomplex.DComplexMatrix2D;
+import com.cern.colt.matrix.tdcomplex.algo.DenseDComplexAlgebra;
 import com.cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix1D;
 import com.cern.colt.matrix.tdcomplex.impl.DenseDComplexMatrix2D;
 import com.cern.colt.matrix.tdouble.DoubleMatrix1D;
 import com.cern.colt.matrix.tdouble.DoubleMatrix2D;
+import com.cern.colt.matrix.tdouble.algo.DenseDoubleAlgebra;
 import com.cern.colt.matrix.tdouble.algo.solver.DoubleCG;
 import com.cern.colt.matrix.tdouble.algo.solver.IterativeSolverDoubleNotConvergedException;
 import com.cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
@@ -84,6 +86,8 @@ public class MW_PURE_LET2D {
         this.beta = 1e-5 * this.alpha * Ey;
 
         walk.setMessage("Preparing...");
+
+        ConcurrencyUtils.setNumberOfThreads(ConcurrencyUtils.getNumberOfThreads());
 
     }
 
@@ -293,22 +297,28 @@ public class MW_PURE_LET2D {
 
         startTime = System.nanoTime(); // start timing
 
+
+        //the most time-costing part
         DComplexMatrix2D matrixFTrans = matrixCF.getConjugateTranspose();
 
         DComplexMatrix2D matrixM = new DenseDComplexMatrix2D(MW_PURE_LET2D.numSubbands,
                 MW_PURE_LET2D.numSubbands);
 
-        AbstractMatrix2D pemFtrans = matrixFTrans.copy();
+        DComplexMatrix2D pemFtrans = matrixFTrans.copy();
 
+        double startTime1 = System.nanoTime();
         matrixFTrans.zMult(matrixCF, matrixM);
+        double runningTime1 = (System.nanoTime() - startTime1) / 1.0E9D;
+        System.out.println("-- multiplication time: " + runningTime1 + " s");
+
 
         DoubleMatrix2D matrixA = matrixM.getRealPart();
         matrixA.assign(DoubleFunctions.div(Math.pow(width * height, 2)));
-        DoubleMatrix1D matrixC = new DenseDoubleMatrix1D(width * height);
 
         runningTime = (System.nanoTime() - startTime) / 1.0E9D;
         System.out.println("Part 2 running time: " + runningTime + " s");
 
+        DoubleMatrix1D matrixC = new DenseDoubleMatrix1D(width * height);
 
         startTime = System.nanoTime(); // start timing
         if (this.seType == 1) {

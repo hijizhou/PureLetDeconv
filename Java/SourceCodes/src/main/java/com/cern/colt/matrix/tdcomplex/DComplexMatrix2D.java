@@ -1657,6 +1657,11 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
                 false);
     }
 
+    public DComplexMatrix2D zMultOps(DComplexMatrix2D B, DComplexMatrix2D C) {
+        return zMultOps(B, C, new double[] { 1, 0 }, (C == null ? new double[] { 1, 0 } : new double[] { 0, 0 }), false,
+                false);
+    }
+
     /**
      * Linear algebraic matrix-matrix multiplication;
      * <tt>C = alpha * A x B + beta*C</tt>. Matrix shapes:
@@ -1745,6 +1750,93 @@ public abstract class DComplexMatrix2D extends AbstractMatrix2D {
         return CC;
     }
 
+    /**
+     * Linear algebraic matrix-matrix multiplication;
+     * <tt>C = alpha * A x B + beta*C</tt>. Matrix shapes:
+     * <tt>A(m x n), B(n x p), C(m x p)</tt>. <br>
+     * Note: Matrix shape conformance is checked <i>after</i> potential
+     * transpositions.
+     *
+     * @param B
+     *            the second source matrix.
+     * @param C
+     *            the matrix where results are to be stored. Set this parameter
+     *            to <tt>null</tt> to indicate that a new result matrix shall be
+     *            constructed.
+     * @return C (for convenience only).
+     *
+     * @throws IllegalArgumentException
+     *             if <tt>B.rows() != A.columns()</tt>.
+     * @throws IllegalArgumentException
+     *             if
+     *             <tt>C.rows() != A.rows() || C.columns() != B.columns()</tt>.
+     * @throws IllegalArgumentException
+     *             if <tt>A == C || B == C</tt>.
+     */
+    public DComplexMatrix2D zMultOps(final DComplexMatrix2D B, DComplexMatrix2D C, final double[] alpha,
+                                  final double[] beta, boolean transposeA, boolean transposeB) {
+        if (transposeA)
+            return getConjugateTranspose().zMult(B, C, alpha, beta, false, transposeB);
+        if (transposeB)
+            return this.zMult(B.getConjugateTranspose(), C, alpha, beta, transposeA, false);
+        final int m = rows;
+        final int n = columns;
+        final int p = n;
+        final DComplexMatrix2D CC;
+        if (C == null) {
+            CC = like(m, p);
+        } else {
+            CC = C;
+        }
+        if (B.rows != n)
+            throw new IllegalArgumentException("Matrix2D inner dimensions must agree:" + toStringShort() + ", "
+                    + B.toStringShort());
+//        if (CC.rows != m || CC.columns != p)
+//            throw new IllegalArgumentException("Incompatibe result matrix: " + toStringShort() + ", "
+//                    + B.toStringShort() + ", " + CC.toStringShort());
+        if (this == CC || B == CC)
+            throw new IllegalArgumentException("Matrices must not be identical");
+        int nthreads = ConcurrencyUtils.getNumberOfThreads();
+        if ((nthreads > 1) && (size() >= ConcurrencyUtils.getThreadsBeginN_2D())) {
+            nthreads = Math.min(nthreads, p);
+            Future<?>[] futures = new Future[nthreads];
+            int k = p / nthreads;
+            for (int j = 0; j < nthreads; j++) {
+                final int firstIdx = j * k;
+                final int lastIdx = (j == nthreads - 1) ? p : firstIdx + k;
+                futures[j] = ConcurrencyUtils.submit(new Runnable() {
+                    public void run() {
+                        double[] s = new double[2];
+                        for (int a = firstIdx; a < lastIdx; a++) {
+                            for (int b = 0; b < m; b++) {
+                                s[0] = 0;
+                                s[1] = 0;
+                                for (int c = 0; c < n; c++) {
+                                    s = DComplex.plus(s, DComplex.mult(getQuick(b, c), B.getQuick(c, a)));
+                                }
+                                CC.setQuick(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(CC
+                                        .getQuick(b, a), beta)));
+                            }
+                        }
+                    }
+                });
+            }
+            ConcurrencyUtils.waitForCompletion(futures);
+        } else {
+            double[] s = new double[2];
+            for (int a = 0; a < p; a++) {
+                for (int b = 0; b < m; b++) {
+                    s[0] = 0;
+                    s[1] = 0;
+                    for (int c = 0; c < n; c++) {
+                        s = DComplex.plus(s, DComplex.mult(getQuick(b, c), B.getQuick(c, a)));
+                    }
+                    CC.setQuick(b, a, DComplex.plus(DComplex.mult(s, alpha), DComplex.mult(CC.getQuick(b, a), beta)));
+                }
+            }
+        }
+        return CC;
+    }
     /**
      * Returns the sum of all cells.
      * 

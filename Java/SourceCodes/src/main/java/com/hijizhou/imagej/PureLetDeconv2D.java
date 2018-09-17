@@ -43,7 +43,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     JSlider sldDemoAlpha = new JSlider(0, 0, 1000, 10);
     JSlider sldDemoStd = new JSlider(0, 0, 1000, 0);
     JSlider sldRunPSFsize = new JSlider(0, 0, 1000, 100);
-    JSlider sldRunAlpha = new JSlider(0, 0, 1000, 100);
+    JSlider sldRunAlpha = new JSlider(0, 0, 1000, 1000);
     JSlider sldRunStd = new JSlider(0, 0, 1000, 100);
     JSlider sldRunNA = new JSlider(0, 50, 200, 140);
     JSlider sldRunLambda = new JSlider(0, 250, 750, 605);
@@ -111,7 +111,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     private JLabel lblRunStd = new JLabel("<html>Gaussian noise<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std.</html>");
     private JLabel lblRunPSFsize = new JLabel("PSF Size");
     private JLabel lblRunPSF = new JLabel("Choose PSF");
-    private JTextField txtRunAlpha = new JTextField("1.00", 3);
+    private JTextField txtRunAlpha = new JTextField("10.0", 3);
     GridPanel jplRunAlpha = addSliderValue(sldRunAlpha, txtRunAlpha, 50);
     private JTextField txtRunNA = new JTextField("1.4", 3);
     private JTextField txtRunLambda = new JTextField("605", 3);
@@ -130,12 +130,16 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     //    private JRadioButton checkRunShowPSF = new JRadioButton("Show PSF?", false);
     private JRadioButton checkRunPostFilter = new JRadioButton("Post-Filtering?", true);
 
+    private JRadioButton runCheckPhysical = new JRadioButton("Physical settings", false);
+    private JRadioButton runCheckDefine = new JRadioButton("Manual", true);
+
+
     public PureLetDeconv2D() {
         super(new Frame(), "PURE-LET Image Deconvolution");
         this.walk
                 .fillAbout(
                         "PURE-LET Image Deconvolution",
-                        "Version 21/08/2018",
+                        "Version 17/09/2018",
                         "PURE-LET Image Deconvolution",
                         "Department of Electronic Engineering<br/>The Chinese University of Hong Kong",
                         "Jizhou Li (hijizhou@gmail.com)",
@@ -258,16 +262,32 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         sldRunPixelSize.setPaintLabels(true);
 
         GridPanel pnRunConvolution = new GridPanel("Convolution");
-        pnRunConvolution.place(0, 0, this.lblRunNA);
-        pnRunConvolution.place(0, 1, this.jplRunNA);
-        pnRunConvolution.place(1, 0, this.lblRunLambda);
-        pnRunConvolution.place(1, 1, this.jplRunLambda);
-        pnRunConvolution.place(2,0, this.lblRunPixelSize);
-        pnRunConvolution.place(2,1,this.jplRunPixelSize);
-        pnRunConvolution.place(3, 0, this.lblRunPSF);
-        pnRunConvolution.place(3, 1, this.cmbPSFRun);
-        pnRunConvolution.place(4, 0, this.lblRunPSFsize);
-        pnRunConvolution.place(4, 1, jplRunPSFsize);
+        GridPanel pnRunConvolutionPhysical= new GridPanel("");
+        GridPanel pnRunConvolutionManual = new GridPanel("");
+
+
+        pnRunConvolutionPhysical.setForeground(Color.gray);
+        pnRunConvolutionPhysical.place(0,1, this.runCheckPhysical);
+        pnRunConvolutionPhysical.place(1, 0, this.lblRunPSF);
+        pnRunConvolutionPhysical.place(1, 1, this.cmbPSFRun);
+        pnRunConvolutionPhysical.place(2, 0, this.lblRunNA);
+        pnRunConvolutionPhysical.place(2, 1, this.jplRunNA);
+        pnRunConvolutionPhysical.place(3, 0, this.lblRunLambda);
+        pnRunConvolutionPhysical.place(3, 1, this.jplRunLambda);
+        pnRunConvolutionPhysical.place(4,0, this.lblRunPixelSize);
+        pnRunConvolutionPhysical.place(4,1,this.jplRunPixelSize);
+        changeStatusRunConvPhysical(false);
+
+
+        pnRunConvolutionManual.place(5,1, this.runCheckDefine);
+        pnRunConvolutionManual.place(6, 0, this.lblRunPSFsize);
+        pnRunConvolutionManual.place(6, 1, jplRunPSFsize);
+
+        pnRunConvolution.place(0,0, pnRunConvolutionPhysical);
+        pnRunConvolution.place(1,0, pnRunConvolutionManual);
+
+        this.runCheckPhysical.addActionListener(this);
+        this.runCheckDefine.addActionListener(this);
         this.cmbPSFRun.addActionListener(this);
 
         GridPanel pnRunNoise = new GridPanel("Noise");
@@ -349,11 +369,48 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         new ImageJ();
 
         // open the Clown sample
-        ImagePlus image = IJ.openImage("/Users/hijizhou/Dropbox/A Documents/Research/A Projects/E2 PURE-LET Java/PureLetDeconv_Icy/ImageJ/src/main/resources/cameraman.tif");
+        ImagePlus image = IJ.openImage("/Users/hijizhou/Documents/Research/A Projects/A01 PURE-LET Deconv/Sharing/PureLetDeconv/Java/SourceCodes/src/main/resources/fluocells.tif");
         image.show();
 
         // run the plugin
         IJ.runPlugIn(clazz.getName(), "");
+    }
+
+    public void changeStatusRunConvManual(boolean isready) {
+        Color color;
+        if (isready) {
+            color = Color.black;
+        } else {
+            color = Color.gray;
+        }
+
+        this.sldRunPSFsize.setForeground(color); this.sldRunPSFsize.setEnabled(isready);
+        this.lblRunPSFsize.setForeground(color); this.lblRunPSFsize.setEnabled(isready);
+        this.txtRunPSFsize.setForeground(color); this.txtRunPSFsize.setEnabled(isready);
+
+    }
+    public void changeStatusRunConvPhysical(boolean isready){
+        Color color;
+        if (isready) {
+            color = Color.black;
+        } else {
+            color = Color.gray;
+        }
+
+        this.lblRunNA.setEnabled(isready);
+        this.sldRunNA.setForeground(color); this.sldRunNA.setEnabled(isready);
+        this.txtRunNA.setForeground(color); this.txtRunNA.setEnabled(isready);
+        this.lblRunPSF.setForeground(color);
+        this.cmbPSFRun.setEnabled(isready); this.cmbPSFRun.setForeground(color);
+
+        this.lblRunLambda.setForeground(color);
+        this.sldRunLambda.setForeground(color); this.sldRunLambda.setEnabled(isready);
+        this.txtRunLambda.setForeground(color); this.txtRunLambda.setEnabled(isready);
+        this.lblRunPixelSize.setForeground(color);
+        this.sldRunPixelSize.setForeground(color); this.sldRunPixelSize.setEnabled(isready);
+        this.txtRunPixelSize.setForeground(color); this.txtRunPixelSize.setEnabled(isready);
+
+
     }
 
     public void changeStatusDemo(boolean isready) {
@@ -424,8 +481,6 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         this.jplRunStd.setEnabled(isready);
         this.bnRunEstNoise.setEnabled(isready);
         this.bnRunRun.setEnabled(isready);
-        this.cmbPSFRun.setEnabled(isready);
-        this.cmbPSFRun.setForeground(color);
         this.txtRunAlpha.setEditable(isready);
         this.txtRunAlpha.setForeground(color);
         this.txtRunStd.setEditable(isready);
@@ -690,6 +745,22 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
             this.sldRunStd.setValue((int) (Double.parseDouble(this.txtRunStd.getText()) * 100.0));
         }
 
+        if (e.getSource() ==  this.runCheckPhysical){
+            if(this.runCheckDefine.isSelected()){
+                this.runCheckDefine.setSelected(false);
+                this.runCheckPhysical.setSelected(true);
+                changeStatusRunConvManual(false);
+                changeStatusRunConvPhysical(true);
+            }
+        }
+        if (e.getSource() ==  this.runCheckDefine){
+            if(this.runCheckPhysical.isSelected()){
+                this.runCheckDefine.setSelected(true);
+                this.runCheckPhysical.setSelected(false);
+                changeStatusRunConvManual(true);
+                changeStatusRunConvPhysical(false);
+            }
+        }
     }
 
     public void noiseEstimation() {
@@ -724,7 +795,6 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         new ImageConverter(this.impOriginal).convertToGray16();
         this.impOriginal.updateAndDraw();
 
-        ConcurrencyUtils.setNumberOfThreads(4);
         this.walk.reset();
         this.walk.setMessage("In progress...");
         IJ.showStatus("Processing...");

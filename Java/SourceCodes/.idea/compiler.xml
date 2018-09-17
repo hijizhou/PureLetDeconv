@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="AoE_tools" />
+        <module name="AoEtools" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="AoE_tools" target="1.8" />
+      <module name="AoEtools" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

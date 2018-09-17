@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AoE_tools.iml" filepath="$PROJECT_DIR$/AoE_tools.iml" />
-      <module fileurl="file://$PROJECT_DIR$/AoE_tools.iml" filepath="$PROJECT_DIR$/AoE_tools.iml" />
       <module fileurl="file://$PROJECT_DIR$/AoEtools.iml" filepath="$PROJECT_DIR$/AoEtools.iml" />
     </modules>
   </component>
