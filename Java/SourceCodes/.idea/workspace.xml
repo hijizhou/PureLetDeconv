@@ -15,8 +15,8 @@
       <file leaf-file-name="PureLetDeconv2D.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/imagej/PureLetDeconv2D.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="135" column="75" lean-forward="true" selection-start-line="135" selection-start-column="75" selection-end-line="135" selection-end-column="75" />
+            <state relative-caret-position="164">
+              <caret line="1081" column="31" lean-forward="false" selection-start-line="1081" selection-start-column="31" selection-end-line="1081" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -598,6 +598,17 @@
               <item name="SourceCodes" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="hijizhou" type="462c0819:PsiDirectoryNode" />
+              <item name="imagej" type="462c0819:PsiDirectoryNode" />
+              <item name="PureLetDeconv2D" type="1a9f42e2:ClassTreeNode" />
+            </path>
+            <path>
+              <item name="AoE_tools" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SourceCodes" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -836,12 +847,12 @@
       <workItem from="1537924972222" duration="4297000" />
       <workItem from="1537931550164" duration="2298000" />
       <workItem from="1537939004683" duration="1167000" />
-      <workItem from="1538228671874" duration="2079000" />
+      <workItem from="1538228671874" duration="4058000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47577000" />
+    <option name="totallyTimeSpent" value="49556000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="55" y="23" width="1225" height="777" extended-state="6" />
@@ -855,7 +866,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32765958" sideWeight="0.4194352" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32765958" sideWeight="0.49392712" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32765958" sideWeight="0.49392712" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1575,8 +1586,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/imagej/PureLetDeconv2D.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="135" column="75" lean-forward="true" selection-start-line="135" selection-start-column="75" selection-end-line="135" selection-end-column="75" />
+        <state relative-caret-position="164">
+          <caret line="1081" column="31" lean-forward="false" selection-start-line="1081" selection-start-column="31" selection-end-line="1081" selection-end-column="31" />
           <folding />
         </state>
       </provider>

@@ -1071,20 +1071,24 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         DoubleMatrix2D Output = sl.getOutputMatrix();
         DecimalFormat df2 = new DecimalFormat("#,###,###,##0.000");
 
+        double runningTimepost = 0.0;
+
         if (this.checkRunPostFilter.isSelected()) {
             //Post-filtering
             walk.setMessage("Starting post-filtering...");
 
+            startTime = System.nanoTime();
+
             Output = ImageUtil.postfiltering(Output, 30 / alphaPoisson);
 
-
+            runningTimepost = (System.nanoTime() - startTime) / 1.0E9D;
             walk.setMessage("Post-filtering finished");
         }
 
         //rescale
 //        Output = rescale(Output, 0, 255);
 
-        this.txtRunTime.setText(df2.format(runningTime));
+        this.txtRunTime.setText(df2.format(runningTime + runningTimepost));
         this.impOutput = ImageUtil.matrix2Plus(Output, cmY, "Deconvolved image");
         this.impOutput.show();
 
