@@ -130,7 +130,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     private JLabel lblRunRunningTime = new JLabel("<html>Running Time (sec.)</html>");
     private JTextField txtRunTime = new JTextField("", 6);
     //    private JRadioButton checkRunShowPSF = new JRadioButton("Show PSF?", false);
-    private JRadioButton checkRunPostFilter = new JRadioButton("Post-Filtering?", true);
+    private JRadioButton checkRunPostFilter = new JRadioButton("Post-Filtering?", false);
 
     private JRadioButton runCheckPhysical = new JRadioButton("Physical settings", false);
     private JRadioButton runCheckDefine = new JRadioButton("Manual", true);
@@ -141,7 +141,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         this.walk
                 .fillAbout(
                         "PURE-LET Image Deconvolution",
-                        "Version 26/09/2018",
+                        "Version 29/09/2018",
                         "PURE-LET Image Deconvolution",
                         "Department of Electronic Engineering<br/>The Chinese University of Hong Kong",
                         "Jizhou Li (hijizhou@gmail.com)",

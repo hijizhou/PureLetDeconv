@@ -251,8 +251,9 @@ public class MW_PURE_LET2Dnew {
                             rvList[i] = rv;
 
                             double time2 = (System.nanoTime() - time1) / 1.0E9D;
-                            System.out.println("proc: " + i + ", w: " + wwi + ", j: " + ji + ", o: " + oi + ", time:" + time2);
-
+                            if(Log) {
+                                IJ.log("proc: " + i + ", w: " + wwi + ", j: " + ji + ", o: " + oi + ", time:" + time2);
+                            }
                         }
 
                     }
