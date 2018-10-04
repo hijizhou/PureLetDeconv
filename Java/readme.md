@@ -65,4 +65,5 @@ This module provides the simulation evaluation. Given the original image and deg
 
 
 Contact: Jizhou Li (hijizhou@gmail.com), The Chinese University of Hong Kong.
+
 Last updated: 29 Sep, 2018
