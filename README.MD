@@ -25,6 +25,9 @@ Typically three different Wiener filters are used, with regularization parameter
 - Very robust to a wide range of noise level.
 - No parameter tuning. 
 
+### Running time:
+- Typically, for a 256×256 size image, the ImageJ plugin takes around 0.3 sec in my Macbook Pro (2.9 GHz, i9).
+
 ### References
 - [1] Li, J., Luisier, F., & Blu, T.,"PURE-LET image deconvolution", IEEE Transactions on Image Processing, Vol. 27 (1), pp. 92–105, January 2018.
 - [2] Li, J., Luisier, F., & Blu, T.,"PURE-LET deconvolution of 3D fluorescence microscopy images", Proceedings of the Fourteenth IEEE International Symposium on Biomedical Imaging (ISBI'17), Melbourne, Australia, pp. 723–727, April 18–21, 2017. _Best student paper award (2nd place)_.
