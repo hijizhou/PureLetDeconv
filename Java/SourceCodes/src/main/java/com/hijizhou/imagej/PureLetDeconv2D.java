@@ -25,6 +25,8 @@ import ij.ImageJ;
 import ij.ImagePlus;
 import ij.WindowManager;
 import ij.gui.GUI;
+import ij.plugin.RGBStackConverter;
+import ij.plugin.RGBStackMerge;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 
@@ -36,6 +38,8 @@ import java.awt.event.*;
 import java.awt.image.ColorModel;
 import java.text.DecimalFormat;
 import java.util.Hashtable;
+
+import static ij.plugin.ChannelSplitter.split;
 
 public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionListener,
         ItemListener, WindowListener, TextListener, Runnable {
@@ -49,7 +53,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     JSlider sldRunNA = new JSlider(0, 50, 200, 140);
     JSlider sldRunLambda = new JSlider(0, 250, 750, 605);
     JSlider sldRunPixelSize = new JSlider(0, 100, 2000, 100);
-    private ColorModel cmY;
+    private ColorModel[] cmY = null;
     private JTabbedPane tab = new JTabbedPane();
     private GridBagLayout layout = new GridBagLayout();
     private GridBagConstraints constraint = new GridBagConstraints();
@@ -65,8 +69,11 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     private ImagePlus impOriginal = null;
     private ImageProcessor ipOriginal = null;
     private ImagePlus impInput = null;
+    private ImagePlus[] channels = null;
+    private ImagePlus[] channelsOutput = null;
     private ImageProcessor ipInput = null;
     private ImagePlus impPSF = null;
+    private double runtime = 0.0;
     private ImagePlus impOutput = null;
     private ImageProcessor ipOutput = null;
     private JTextField txtOriginal;
@@ -372,7 +379,8 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         new ImageJ();
 
         // open the Clown sample
-        ImagePlus image = IJ.openImage("/Users/hijizhou/Documents/Research/A Projects/A01 PURE-LET Deconv/Sharing/PureLetDeconv/Java/SourceCodes/src/main/resources/fluocells.tif");
+        String path = "/Users/hijizhou/Google Drive/Research/A Projects/A01 PURE-LET Deconv/Sharing/PureLetDeconv/Java/SourceCodes/src/main/resources/";
+        ImagePlus image = IJ.openImage(path + "fernan.tif");
         image.show();
 
         // run the plugin
@@ -588,24 +596,21 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
             return;
         }
 
-        this.estInput = Builder.create(this.impInput);
-
-        if (this.impInput.getStackSize() > 1) {
-            IJ.showMessage("Only 2D grayscale image is supported.");
-            this.thread = null;
-            changeStatusRun(false);
-            return;
-        }
-        if (this.impInput.getChannel() > 1) {
-            IJ.showMessage("Only 2D grayscale image is supported.");
-            this.thread = null;
-            changeStatusRun(false);
-            return;
-        }
-
-
+        this.channels = split(impInput);
         this.width = impInput.getWidth();
         this.height = impInput.getHeight();
+        int nchannel = this.channels.length;
+
+        if (nchannel > 1) {
+            //multi-channel or stack image
+            this.estInput = Builder.create(channels[0]); //estimate noise level from 1st channel
+        }else {
+            this.channels = new ImagePlus[1];
+            this.channels[0] = impInput;
+            this.estInput = Builder.create(this.impInput);
+        }
+        this.cmY = new ColorModel[nchannel];
+        this.channelsOutput = new ImagePlus[nchannel];
 
         if (this.width != this.height) {
             IJ.showMessage("Only square image is supported currently.");
@@ -616,12 +621,6 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
 
         if (this.width % 2 != 0) {
             this.txtOriginal.setText("Only 2^n size image is supported currently.");
-            changeStatusRun(false);
-            return;
-        }
-
-        if (this.impInput.isComposite()) {
-            this.txtInput.setText("This plugin does not handle composite yet.");
             changeStatusRun(false);
             return;
         }
@@ -769,31 +768,46 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
     public void noiseEstimation() {
         this.walk.setMessage("Starting noise estimation...");
         long startTime = System.nanoTime();
-        double[] fitRs = Operations.estimateNoiseParams(estInput, 100);
-
-        long endTime = System.nanoTime();
-
-        double estTime = (endTime - startTime) / 1000000000.0;
-        System.out.println("Noise estimation time: " + estTime);
-
-        double alpha = fitRs[0] >= 0 ? fitRs[0] : 0.001;
-        double variance = fitRs[2] * fitRs[2];
 
         DecimalFormat df2 = new DecimalFormat("#,###,###,##0.00");
 
+        int nchannel = this.channels.length;
+        double alpha = 0.001;
+        double totaltime = 0.0;
+        for(int i=0; i<nchannel; i++){
+            this.estInput = Builder.create(channels[i]);
+            double[] fitRs = Operations.estimateNoiseParams(estInput, 100);
+
+            long endTime = System.nanoTime();
+
+            double estTime = (endTime - startTime) / 1000000000.0;
+            this.walk.setMessage("Channel [" + i + "], estimation time: " + estTime);
+            totaltime = totaltime + estTime;
+
+            double alphaItr = fitRs[0] >= 0 ? fitRs[0] : 0.001;
+//            double variance = fitRs[2] * fitRs[2];
+
+            if(alphaItr > alpha)
+            {
+                alpha = alphaItr; //take the maximum number of alpha as the overall alpha
+            }
+
+        }
+
         this.txtRunAlpha.setText(new Double(df2.format(alpha)) + "");
-        this.txtRunStd.setText(new Double(df2.format(variance)) + "");
+//        this.txtRunStd.setText(new Double(df2.format(variance)) + "");
 
         this.sldRunAlpha.setValue((int) alpha * 100);
-        this.sldRunStd.setValue((int) variance * 100);
-        this.walk.setMessage("Finished [" + new Double(df2.format(estTime)) + "s], press Start Deconvolution");
+//        this.sldRunStd.setValue((int) variance * 100);
+
+        this.walk.setMessage("Finished [" + new Double(df2.format(totaltime)) + "s], press Start Deconvolution");
     }
 
     public void doSimulation() {
 
         this.isrunning = true;
         ipOriginal = impOriginal.getProcessor();
-        this.cmY = ipOriginal.getColorModel();
+        this.cmY[0] = ipOriginal.getColorModel();
 
         new ImageConverter(this.impOriginal).convertToGray16();
         this.impOriginal.updateAndDraw();
@@ -850,7 +864,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         double inputPSNR = Evaluation.psnr(Input, Original);
         this.txtSimuTime.setText(df2.format(simulationTime));
         this.txtInputPSNR.setText(df2.format(inputPSNR));
-        this.impInput = ImageUtil.matrix2Plus(Input, cmY, "Simulated blurred-noisy image (alpha: " + alphaPoisson + ", std: " + sigmaGauss + ")");
+        this.impInput = ImageUtil.matrix2Plus(Input, cmY[0], "Simulated blurred-noisy image (alpha: " + alphaPoisson + ", std: " + sigmaGauss + ")");
         this.impInput.show();
         this.ipInput = this.impInput.getProcessor();
 
@@ -991,7 +1005,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         double outputPSNR = Evaluation.psnr(Output, Original);
         this.txtRunningTime.setText(df2.format(runningTime));
         this.txtOutputPSNR.setText(df2.format(outputPSNR));
-        this.impOutput = ImageUtil.matrix2Plus(Output, cmY, "Deconvolved image");
+        this.impOutput = ImageUtil.matrix2Plus(Output, cmY[0], "Deconvolved image");
         this.impOutput.show();
 
         this.bnDemoRun.setEnabled(true);
@@ -1006,14 +1020,66 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
 
     }
 
-    public void runRun() {
+    public void runRun(){
+        //run all channels
+        int nchannel = this.channels.length;
+
+        ImagePlus tmpOutput = null;
+
+        DecimalFormat df2 = new DecimalFormat("#,###,###,##0.000");
+
+        double runtime = 0.0;
+        for(int i=0; i<nchannel; i++){
+
+            double startTime = System.nanoTime(); // start timing
+
+            tmpOutput = runRunChannel(this.channels[i]);
+
+            double runningTime = (System.nanoTime() - startTime) / 1.0E9D;
+
+            runtime = runtime + runningTime;
+            channelsOutput[i] = tmpOutput;
+            walk.setMessage("Channel " + i + ", finished [" + runningTime + " s]");
+        }
+
+
+        this.txtRunTime.setText(df2.format(runtime));
+
+        ImagePlus output = null;
+
+        if(nchannel==1){
+            output = channelsOutput[0];
+        }else {
+       output = RGBStackMerge.mergeChannels(channelsOutput, false);
+//       RGBStackConverter.convertToRGB(output);
+
+        }
+
+        output.show();
+
+        //contrast adjust, for visualization purpose only
+        ContrastAdjuster.adjustContrast(output, output.getProcessor(),180);
+
+        this.bnRunRun.setEnabled(true);
+        this.bnRunRun.setText("Start Deconvolution");
+        this.bnRunRun.setForeground(Color.black);
+        this.txtRunTime.setForeground(Color.black);
+        this.walk.reset();
+        this.walk.setMessage(this.defaultMessage);
+        IJ.showStatus("Deconvolution finished");
+        this.isrunning = false;
+
+    }
+
+
+    public ImagePlus runRunChannel(ImagePlus channel) {
 
 //        ConcurrencyUtils.setNumberOfThreads(4);
         this.width = this.impInput.getWidth();
         this.height = this.impInput.getHeight();
 
-        this.ipInput = this.impInput.getProcessor();
-        this.cmY = ipInput.getColorModel();
+        this.ipInput = channel.getProcessor();
+        this.cmY[0] = this.ipInput.getColorModel();
 
         DoubleMatrix2D PSF = new DenseDoubleMatrix2D(width, height);
 
@@ -1064,12 +1130,11 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         MW_PURE_LET2Dnew sl;
         sl = new MW_PURE_LET2Dnew(Input, PSF, noisePar, this.walk, Log);
 
-        double startTime = System.nanoTime(); // start timing
+
         sl.doDeconvolution();
-        double runningTime = (System.nanoTime() - startTime) / 1.0E9D;
+
 
         DoubleMatrix2D Output = sl.getOutputMatrix();
-        DecimalFormat df2 = new DecimalFormat("#,###,###,##0.000");
 
         double runningTimepost = 0.0;
 
@@ -1077,7 +1142,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
             //Post-filtering
             walk.setMessage("Starting post-filtering...");
 
-            startTime = System.nanoTime();
+            double startTime = System.nanoTime();
 
             Output = ImageUtil.postfiltering(Output, 30 / alphaPoisson);
 
@@ -1088,18 +1153,9 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         //rescale
 //        Output = rescale(Output, 0, 255);
 
-        this.txtRunTime.setText(df2.format(runningTime + runningTimepost));
-        this.impOutput = ImageUtil.matrix2Plus(Output, cmY, "Deconvolved image");
-        this.impOutput.show();
+        ImagePlus impOutput = ImageUtil.matrix2Plus(Output, cmY[0], "Deconvolved image");
 
-        this.bnRunRun.setEnabled(true);
-        this.bnRunRun.setText("Start Deconvolution");
-        this.bnRunRun.setForeground(Color.black);
-        this.txtRunTime.setForeground(Color.black);
-        this.walk.reset();
-        this.walk.setMessage(this.defaultMessage);
-        IJ.showStatus("Deconvolution finished");
-        this.isrunning = false;
+        return impOutput;
 
     }
 
