@@ -12,17 +12,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="PureLetDeconv2D.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="PureLetDeconv2D.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/imagej/PureLetDeconv2D.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="254">
-              <caret line="1060" column="72" lean-forward="false" selection-start-line="1060" selection-start-column="72" selection-end-line="1060" selection-end-column="72" />
+            <state relative-caret-position="179">
+              <caret line="1055" column="9" lean-forward="false" selection-start-line="1055" selection-start-column="9" selection-end-line="1055" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#12734#12750#0" expanded="true" />
-                <element signature="e#13221#13237#0" expanded="true" />
-                <element signature="e#13676#13692#0" expanded="true" />
-                <element signature="e#23878#23895#0" expanded="true" />
                 <element signature="e#27825#27826#0" expanded="true" />
                 <element signature="e#27882#27883#0" expanded="true" />
                 <element signature="e#28779#28780#0" expanded="true" />
@@ -44,26 +40,6 @@
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DenseDoubleMatrix2D.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/cern/colt/matrix/tdouble/impl/DenseDoubleMatrix2D.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="142">
-              <caret line="2475" column="0" lean-forward="false" selection-start-line="2475" selection-start-column="0" selection-end-line="2475" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Builder.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/imageware/Builder.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="149">
-              <caret line="132" column="28" lean-forward="false" selection-start-line="132" selection-start-column="28" selection-end-line="132" selection-end-column="28" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -97,6 +73,26 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="498">
               <caret line="518" column="30" lean-forward="false" selection-start-line="518" selection-start-column="30" selection-end-line="518" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="91">
+              <caret line="78" column="47" lean-forward="true" selection-start-line="78" selection-start-column="47" selection-end-line="78" selection-end-column="47" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="plugins.config" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/plugins.config">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="30" lean-forward="false" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -327,43 +323,6 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="com" type="462c0819:PsiDirectoryNode" />
               <item name="hijizhou" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AoE_tools" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SourceCodes" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="com" type="462c0819:PsiDirectoryNode" />
-              <item name="hijizhou" type="462c0819:PsiDirectoryNode" />
-              <item name="cores" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AoE_tools" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SourceCodes" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="com" type="462c0819:PsiDirectoryNode" />
-              <item name="hijizhou" type="462c0819:PsiDirectoryNode" />
-              <item name="imagej" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AoE_tools" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SourceCodes" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="com" type="462c0819:PsiDirectoryNode" />
-              <item name="hijizhou" type="462c0819:PsiDirectoryNode" />
-              <item name="utilities" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="AoE_tools" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SourceCodes" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -610,7 +569,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61968000" />
+    <option name="totallyTimeSpent" value="62673000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="55" y="23" width="1225" height="777" extended-state="0" />
@@ -737,22 +696,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/imageware/Operations.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14985">
-          <caret line="1001" column="28" lean-forward="false" selection-start-line="1001" selection-start-column="28" selection-end-line="1001" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1905">
-          <caret line="127" column="41" lean-forward="true" selection-start-line="127" selection-start-column="41" selection-end-line="127" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/AoEtools.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -766,10 +709,6 @@
           <caret line="580" column="9" lean-forward="false" selection-start-line="580" selection-start-column="9" selection-end-line="580" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#12734#12750#0" expanded="true" />
-            <element signature="e#13221#13237#0" expanded="true" />
-            <element signature="e#13676#13692#0" expanded="true" />
-            <element signature="e#23878#23895#0" expanded="true" />
             <element signature="e#27825#27826#0" expanded="true" />
             <element signature="e#27882#27883#0" expanded="true" />
             <element signature="e#28779#28780#0" expanded="true" />
@@ -841,10 +780,6 @@
           <caret line="580" column="9" lean-forward="false" selection-start-line="580" selection-start-column="9" selection-end-line="580" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#12734#12750#0" expanded="true" />
-            <element signature="e#13221#13237#0" expanded="true" />
-            <element signature="e#13676#13692#0" expanded="true" />
-            <element signature="e#23878#23895#0" expanded="true" />
             <element signature="e#27825#27826#0" expanded="true" />
             <element signature="e#27882#27883#0" expanded="true" />
             <element signature="e#28779#28780#0" expanded="true" />
@@ -870,10 +805,6 @@
           <caret line="580" column="9" lean-forward="true" selection-start-line="580" selection-start-column="9" selection-end-line="580" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#12734#12750#0" expanded="true" />
-            <element signature="e#13221#13237#0" expanded="true" />
-            <element signature="e#13676#13692#0" expanded="true" />
-            <element signature="e#23878#23895#0" expanded="true" />
             <element signature="e#27825#27826#0" expanded="true" />
             <element signature="e#27882#27883#0" expanded="true" />
             <element signature="e#28779#28780#0" expanded="true" />
@@ -1343,22 +1274,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/plugins.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="67" lean-forward="false" selection-start-line="10" selection-start-column="67" selection-end-line="10" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="248">
-          <caret line="126" column="30" lean-forward="false" selection-start-line="126" selection-start-column="21" selection-end-line="126" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/utilities/ImageUtil.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2">
@@ -1387,14 +1302,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/imagej/PureLetDeconv2D.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="254">
-          <caret line="1060" column="72" lean-forward="false" selection-start-line="1060" selection-start-column="72" selection-end-line="1060" selection-end-column="72" />
+        <state relative-caret-position="179">
+          <caret line="1055" column="9" lean-forward="false" selection-start-line="1055" selection-start-column="9" selection-end-line="1055" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#12734#12750#0" expanded="true" />
-            <element signature="e#13221#13237#0" expanded="true" />
-            <element signature="e#13676#13692#0" expanded="true" />
-            <element signature="e#23878#23895#0" expanded="true" />
             <element signature="e#27825#27826#0" expanded="true" />
             <element signature="e#27882#27883#0" expanded="true" />
             <element signature="e#28779#28780#0" expanded="true" />
@@ -1404,6 +1315,38 @@
             <element signature="e#37005#37006#0" expanded="true" />
             <element signature="e#37030#37031#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/cern/colt/matrix/tdouble/impl/DenseDoubleMatrix2D.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="142">
+          <caret line="2475" column="0" lean-forward="false" selection-start-line="2475" selection-start-column="0" selection-end-line="2475" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/plugins.config">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="30" lean-forward="false" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/hijizhou/imageware/Builder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="132" column="28" lean-forward="false" selection-start-line="132" selection-start-column="28" selection-end-line="132" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="78" column="47" lean-forward="true" selection-start-line="78" selection-start-column="47" selection-end-line="78" selection-end-column="47" />
+          <folding />
         </state>
       </provider>
     </entry>
