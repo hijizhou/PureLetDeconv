@@ -148,7 +148,7 @@ public class PureLetDeconv2D extends JDialog implements ChangeListener, ActionLi
         this.walk
                 .fillAbout(
                         "PURE-LET Image Deconvolution",
-                        "Version 29/09/2018",
+                        "Version 25/11/2018",
                         "PURE-LET Image Deconvolution",
                         "Department of Electronic Engineering<br/>The Chinese University of Hong Kong",
                         "Jizhou Li (hijizhou@gmail.com)",
