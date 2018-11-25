@@ -61,9 +61,13 @@ This module provides the simulation evaluation. Given the original image and deg
 
 - The automatical estimation of the PSF size based on the algorithm described in Li et al. "Gaussian blur estimation for photon-limited images", ICIP'17.
 - The 3D deconvolution module.
-- Color image and image sequence processing supports.
+- Image sequence processing supports.
 
+### Updates:
+-----------
+
+- Add multi-channel image processing support.
 
 Contact: Jizhou Li (hijizhou@gmail.com), The Chinese University of Hong Kong.
 
-Last updated: 29 Sep, 2018
+Last updated: 25 Nov, 2018
