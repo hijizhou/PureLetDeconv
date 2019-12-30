@@ -178,20 +178,30 @@ public class SigmFit {
         int slices1 = ipOriginal.getStackSize();
         ImageStack stack1 = ipOriginal.getStack();
 
+//        slices1 = 2;
         //create the ratio image
-        ImageStack stackPH = ipOriginal.createEmptyStack();
-        for (int i = 1; i <= slices1; i++) {
-            ImageProcessor ipp1 = stack1.getProcessor(i);
-            ImageProcessor ipp2 = ipp1.duplicate();
-            ipp2 = ipp2.convertToFloat();
-            stackPH.addSlice(stack1.getSliceLabel(i), ipp2);
-        }
+//        ImageStack stackPH = ipOriginal.getStack().duplicate();
+//        for (int i = 1; i <= 1; i++) {
+//            ImageProcessor ipp1 = stack1.getProcessor(i);
+//            ImageProcessor ipp2 = ipp1.duplicate();
+//            ipp2 = ipp2.convertToFloat();
+//            stackPH.addSlice(stack1.getSliceLabel(i), ipp2);
+//        }
+//        stackPH = stack1.duplicate();
 
-        ImagePlus imgPH = new ImagePlus("pH map", stackPH);
+//        ImagePlus imgPH = new ImagePlus("pH map", stackPH);
+
+//        ImagePlus imgPH = new ImagePlus();
+            ImageStack stackPH = new ImageStack(ipOriginal.getWidth(), ipOriginal.getHeight(), slices1);
 
         for (int n = 1; n <= slices1; n++) {
 
-            FloatProcessor fpCal = stack1.getProcessor(n).convertToFloatProcessor();
+            IJ.showStatus("Computing pH image " + n);
+
+            ImageProcessor ipp1 = ipOriginal.getStack().getProcessor(n);
+//            imgPH.setProcessor(ipp1);
+
+            FloatProcessor fpCal = ipp1.convertToFloatProcessor();
 
             float[] Yf = (float[]) fpCal.getPixels();
             double[] Y = new double[Yf.length];
@@ -199,18 +209,27 @@ public class SigmFit {
                 Y[i] = (double) Yf[i];
             }
             double[] Xd = evalInvFit(Y);
+           // double[] Xd = Y;
             float[] X = new float[Xd.length];
             for (int i = 0; i < X.length; i++) {
+                if (Double.isInfinite(Xd[i])) {
+                    Xd[i]=Double.NaN;
+                }
                 X[i] = (float) Xd[i];
+
             }
 
+//            System.out.println(X[118779]);
             fpCal.setPixels(X);
 
 //            ImagePlus phImg = new ImagePlus("pH Map", fpCal);
 
-            imgPH.setProcessor(fpCal);
+//            imgPH.setProcessor(fpCal);
+            stackPH.setProcessor(fpCal,n);
+
 
         }
+        ImagePlus imgPH = new ImagePlus("pH map", stackPH);
         return imgPH;
 
     }

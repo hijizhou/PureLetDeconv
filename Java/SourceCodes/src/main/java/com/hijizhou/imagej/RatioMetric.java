@@ -16,15 +16,12 @@ import com.hijizhou.cores.ratiometric.RatioImg;
 import com.hijizhou.cores.ratiometric.SigmFit;
 import com.hijizhou.utilities.GridPanel;
 import com.hijizhou.utilities.WalkBar;
-import ij.IJ;
-import ij.ImageJ;
-import ij.ImagePlus;
-import ij.WindowManager;
-import ij.gui.GUI;
-import ij.gui.Overlay;
-import ij.gui.Roi;
+import ij.*;
+import ij.gui.*;
 import ij.measure.CurveFitter;
+import ij.measure.ResultsTable;
 import ij.plugin.frame.Fitter;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 import ij.process.LUT;
@@ -40,12 +37,13 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         WindowListener, TextListener, Runnable {
 
     private static final long serialVersionUID = 1L;
+    private StringBuffer legend = new StringBuffer();
     SigmFit sf = new SigmFit();
     /*
     Main GUI
      */
     private Thread thread = null;
-    private String defaultMessage = "(c) 2018 CUHK";
+    private String defaultMessage = "(c) 2019 CUHK";
     private WalkBar walk = new WalkBar(this.defaultMessage, true, false, true);
     private JTabbedPane tab = new JTabbedPane();
     private GridBagLayout layout = new GridBagLayout();
@@ -56,7 +54,7 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
     private JButton btnCalAdd = new JButton("Add");
     private JButton btnCalDef = new JButton("Default");
     private JButton btnCalRun = new JButton("Run");
-    private JSlider sldCalpH = new JSlider(0, 0, 100, 50);
+    private JSlider sldCalpH = new JSlider(0, 0, 140, 50);
     private JTextField txtCalpH = new JTextField("pH = 5.0", 3);
     private JTextArea taCalPH = new JTextArea(10, 10);
     private JTextArea taCalData = new JTextArea(10, 10);
@@ -74,6 +72,9 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
 
     private JComboBox choiceProCh1 = new JComboBox();
     private JComboBox choiceProCh2 = new JComboBox();
+    private JLabel lblEquation = new JLabel("Fitting Equation: ");
+    private JTextArea txtEquation = new JTextArea(7, 10);
+
     private JLabel lblProImg1 = new JLabel("Image 1");
     private JLabel lblProBg1 = new JLabel("Background:");
     private JLabel lblProClip1 = new JLabel("Clipping: ");
@@ -105,8 +106,10 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
     private JTextField txtProRatioMin = new JTextField("", 3);
     private JTextField txtProRatioMax = new JTextField("", 3);
 
-    private JButton btnProAll = new JButton("Analysis");
+    private JButton btnProAll = new JButton("ROI Analysis");
     private JButton btnProROI = new JButton("Enlarge ROI");
+    private JButton btnPlotMean = new JButton("Plot Mean");
+
     private JButton btnProPlot = new JButton("Plot");
     private JButton btnProRegion = new JButton("Region");
 
@@ -116,11 +119,11 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         this.walk
                 .fillAbout(
                         "RatioMetric Analysis",
-                        "Version 13/04/2018",
+                        "Version 29/12/2019",
                         "Ratio imaging and pH map",
                         "Department of Electronic Engineering<br/>The Chinese University of Hong Kong",
                         "Jizhou Li (hijizhou@gmail.com)",
-                        "2018",
+                        "2019",
                         "<p style=\"text-align:left\"><b>References:</b><br>[1] Miesenböck, G., De Angelis, D. A., & Rothman, J. E. (1998). Visualizing secretion and synaptic transmission with pH-sensitive green fluorescent proteins. Nature, 394(6689), 192.<br><br><b>Acknowledgements:</b><br>Prof. Thierry Blu<br>Prof. Liwen Jiang<br>Dr. Jinbo Shen");
 
 
@@ -134,6 +137,8 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
 
         txtCalpH.setEditable(false);
         Hashtable<Integer, JLabel> labelCalTable = new Hashtable<>();
+        labelCalTable.put(new Integer(140), new JLabel("14"));
+        labelCalTable.put(new Integer(120), new JLabel("12"));
         labelCalTable.put(new Integer(100), new JLabel("10"));
         labelCalTable.put(new Integer(75), new JLabel("7.5"));
         labelCalTable.put(new Integer(50), new JLabel("5.0"));
@@ -247,25 +252,31 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         plDisplay.setBorder(BorderFactory.createTitledBorder("Display"));
 
 
+        JPanel tabFitEqu = new JPanel();
+        tabFitEqu.setLayout(this.layout);
+        addComponentFree(tabFitEqu, 0, 0, 1, 1, 0, this.lblEquation);
+        addComponentFree(tabFitEqu, 1, 0, 1, 1, 0, this.txtEquation);
+
         JPanel tabPro = new JPanel();
         tabPro.setLayout(this.layout);
-        addComponentFree(tabPro, 0, 0, 1, 1, 0, this.lblProImg1);
-        addComponentFree(tabPro, 0, 1, 1, 1, 0, this.choiceProCh1);
-        addComponentFree(tabPro, 1, 0, 1, 1, 0, this.lblProBg1);
-        addComponentFree(tabPro, 1, 1, 1, 1, 0, plBg1);
-        addComponentFree(tabPro, 2, 0, 1, 1, 0, this.lblProClip1);
-        addComponentFree(tabPro, 2, 1, 1, 1, 0, plClip1);
 
-        addComponentFree(tabPro, 3, 0, 1, 1, 0, this.lblProImg2);
-        addComponentFree(tabPro, 3, 1, 1, 1, 0, this.choiceProCh2);
-        addComponentFree(tabPro, 4, 0, 1, 1, 0, this.lblProBg2);
-        addComponentFree(tabPro, 4, 1, 1, 1, 0, plBg2);
-        addComponentFree(tabPro, 5, 0, 1, 1, 0, this.lblProClip2);
-        addComponentFree(tabPro, 5, 1, 1, 1, 0, plClip2);
+        addComponentFree(tabPro, 1, 0, 1, 1, 0, this.lblProImg1);
+        addComponentFree(tabPro, 1, 1, 1, 1, 0, this.choiceProCh1);
+        addComponentFree(tabPro, 2, 0, 1, 1, 0, this.lblProBg1);
+        addComponentFree(tabPro, 2, 1, 1, 1, 0, plBg1);
+        addComponentFree(tabPro, 3, 0, 1, 1, 0, this.lblProClip1);
+        addComponentFree(tabPro, 3, 1, 1, 1, 0, plClip1);
 
-        addComponentFree(tabPro, 6, 0, 4, 2, 0, plDisplay);
-        addComponentFree(tabPro, 8, 0, 1, 1, 0, this.btnProcUpdate);
-        addComponentFree(tabPro, 8, 1, 1, 1, 0, this.btnProcRun);
+        addComponentFree(tabPro, 4, 0, 1, 1, 0, this.lblProImg2);
+        addComponentFree(tabPro, 4, 1, 1, 1, 0, this.choiceProCh2);
+        addComponentFree(tabPro, 5, 0, 1, 1, 0, this.lblProBg2);
+        addComponentFree(tabPro, 5, 1, 1, 1, 0, plBg2);
+        addComponentFree(tabPro, 6, 0, 1, 1, 0, this.lblProClip2);
+        addComponentFree(tabPro, 6, 1, 1, 1, 0, plClip2);
+
+        addComponentFree(tabPro, 7, 0, 4, 2, 0, plDisplay);
+        addComponentFree(tabPro, 9, 0, 1, 1, 0, this.btnProcUpdate);
+        addComponentFree(tabPro, 9, 1, 1, 1, 0, this.btnProcRun);
         this.btnProcUpdate.addActionListener(this);
         this.btnProcRun.addActionListener(this);
         this.btnProBg1.addActionListener(this);
@@ -302,9 +313,11 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         ProStatisRight.setLayout(this.layout);
         addComponent(ProStatisRight, 0, 1, 1, 1, 4, this.btnProAll);
         addComponent(ProStatisRight, 0, 0, 1, 1, 4, this.btnProROI);
+        addComponent(ProStatisRight, 1, 0, 1, 1, 4, this.btnPlotMean);
 //        addComponent(ProStatisRight, 2, 0, 1, 1, 4, this.btnProPlot);
         this.btnProAll.addActionListener(this);
         this.btnProROI.addActionListener(this);
+        this.btnPlotMean.addActionListener(this);
         this.btnProPlot.addActionListener(this);
         this.btnProRegion.addActionListener(this);
 
@@ -314,7 +327,9 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         addComponent(ProStatis, 0, 0, 1, 1, 4, ProStatisRight);
         ProStatis.setBorder(BorderFactory.createTitledBorder("Results"));
 
-        addComponentFree(tabPro, 9, 0, 2, 1, 4, ProStatis);
+        addComponentFree(tabPro, 10, 0, 2, 1, 4, ProStatis);
+
+        addComponentFree(tabPro, 12, 0, 2, 1, 4, tabFitEqu);
 
 		/*
 		Main GUI
@@ -353,17 +368,17 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
 
         // open the Clown sample
         ImagePlus image1 = IJ
-                .openImage("/Users/hijizhou/Dropbox/A Documents/Research/A Projects/C6 pHfit/AoEtools/Github/src/main/resources/Channel 1.tif");
+                .openImage("//Users/lijz/Desktop/C1-XYZT__.tif");
         image1.show();
         ImagePlus image2 = IJ
-                .openImage("/Users/hijizhou/Dropbox/A Documents/Research/A Projects/C6 pHfit/AoEtools/Github/src/main/resources/Channel 2.tif");
+                .openImage("/Users/lijz/Desktop/C3-XYZT__.tif");
         image2.show();
-
+//
         ImagePlus image3 = IJ
-                .openImage("/Users/hijizhou/Dropbox/A Documents/Research/A Projects/C6 pHfit/AoEtools/Github/src/main/resources/mitosis-ch0.tif");
+                .openImage("/Users/lijz/Desktop/C1.tif");
         image3.show();
         ImagePlus image4 = IJ
-                .openImage("/Users/hijizhou/Dropbox/A Documents/Research/A Projects/C6 pHfit/AoEtools/Github/src/main/resources/mitosis-ch1.tif");
+                .openImage("/Users/lijz/Desktop/C3.tif");
         image4.show();
 
         // run the plugin
@@ -477,6 +492,9 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         if (e.getSource() == this.btnProROI) {
             pHvalues("ROI");
         }
+        if (e.getSource()== this.btnPlotMean){
+            plotMean();
+        }
         if (e.getSource() == this.btnProAll) {
 //            pHvalues("All");
 
@@ -492,6 +510,55 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         }
     }
 
+    void plotMean()
+    {
+        ImagePlus imp = IJ.getImage();
+
+
+        int n = imp.getStackSize();
+
+        double[] sum = new double[n];
+        double[] x = new double[n];
+
+
+        for (int j = 0; j<n; j++) {
+
+                IJ.showStatus("Computing pH image " + j);
+
+                ImageProcessor ipp1 =   imp.getStack().getProcessor(j+1);
+//            imgPH.setProcessor(ipp1);
+
+                FloatProcessor fpCal = ipp1.convertToFloatProcessor();
+                float[] Yf = (float[]) fpCal.getPixels();
+                sum[j] = 0;
+
+                int k=1;
+                for (int i = 0; i < Yf.length; i++) {
+                    if (!Double.isInfinite(Yf[i]) && !Double.isNaN(Yf[i])) {
+                        sum[j] = (double) sum[j] + Yf[i];
+                        k = k+1;
+                    }
+
+                }
+                sum[j] = sum[j]/k;
+
+                x[j] = j+1;
+
+        }
+
+        PlotWindow.noGridLines = false; // draw grid lines
+        Plot plot = new Plot("Mean Plot","Frame","Value", x, sum);
+
+        for (int i = 0; i < n; i++)
+        {
+                plot.addPoints(x, sum, 2);
+
+        }
+
+        plot.setLineWidth(2);
+        plot.show();
+        plot.draw();
+    }
     public void getProRatioImage() {
 
         int i1Index = this.choiceProCh1.getSelectedIndex() - 1;
@@ -573,9 +640,22 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         switch (tag) {
             case "All":
                 imgPH = sf.evalInvFit(imgRatio);
-                statPh = imgPH.getStatistics();
-                statRatio = imgRatio.getStatistics();
+                //imgPH = imgRatio;
 
+//                ImageStack stack1 = imgPH.getStack();
+
+//                new ImagePlus("",stack1.getProcessor(1)).show();
+
+//                imgPH.show();
+
+//                statPh = imgPH.getStatistics();
+//                statRatio = imgRatio.getStatistics();
+
+//                ImageStack stack1 = imgPH.getStack();
+//                for (int i = 0; i < imgPH.getStackSize(); i++) {
+//                    IJ.setThreshold(new ImagePlus("",stack1.getProcessor(1)), lowb, upb);
+//                }
+//
                 IJ.setThreshold(imgPH, lowb, upb);
 
                 imgPH.setDisplayRange(lowb, upb);
@@ -700,6 +780,24 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
         sf.setD(5);
         CurveFitter fit = sf.doFit(aryPH, aryData);
 
+
+        StringBuffer legendstr = new StringBuffer(100);
+        legendstr.append('\n');
+        legendstr.append(String.valueOf(this.choiceFun.getSelectedItem()));
+        legendstr.append('\n');
+        legendstr.append(fit.getFormula());
+        legendstr.append('\n');
+        double[] p = fit.getParams();
+        int n = fit.getNumParams();
+        char pChar = 'a';
+
+        for(int i = 0; i < n; ++i) {
+            legendstr.append(pChar + " = " + IJ.d2s(p[i], 5, 9) + '\n');
+            ++pChar;
+        }
+
+        this.setLegend(legendstr);
+
         Fitter.plot(fit);
 
         ////////////////////////// remove the equation display ////////////
@@ -724,6 +822,12 @@ public class RatioMetric extends JDialog implements ChangeListener, ActionListen
 //        Calibration cal = phImg.getCalibration();
 //        cal.setFunction(22, sf.getParameters(), "Gray Value", true);
 //        phImg.setGlobalCalibration(cal);
+
+    }
+
+    public void setLegend(StringBuffer legendstr){
+        this.legend = legendstr;
+        this.txtEquation.setText(this.legend.toString().trim());
 
     }
 

@@ -1,5 +1,6 @@
 package com.hijizhou.cores.ratiometric;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.ImageProcessor;
@@ -29,8 +30,12 @@ public class RatioImg {
         }
         ImagePlus imgRatio = new ImagePlus("Ratio Image", stackRatio);
 
+
         for (int n = 1; n <= slices2; n++) {
-            ip1 = stack1.getProcessor(n <= slices1 ? n : slices1);
+//            ip1 = stack1.getProcessor(n <= slices1 ? n : slices1);
+            IJ.showStatus("Computing ratio image " + n);
+            IJ.showProgress(n, slices2);
+            ip1 = stack1.getProcessor(n);
             ip2 = stack2.getProcessor(n);
             ipRatio = stackRatio.getProcessor(n);
             for (int x = 0; x < width; x++) {
